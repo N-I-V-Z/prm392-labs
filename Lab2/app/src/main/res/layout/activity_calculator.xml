@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <EditText
+            android:id="@+id/etSo1"
+            style="@style/CaculatorEditTextStyle"
+            android:hint="Nhập số thứ nhất"
+            android:inputType="numberDecimal" />
+
+        <EditText
+            android:id="@+id/etSo2"
+            style="@style/CaculatorEditTextStyle"
+            android:hint="Nhập số thứ hai"
+            android:inputType="numberDecimal" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnAdd"
+                style="@style/CaculatorButtonStyle"
+                android:text="CỘNG" />
+
+            <Button
+                android:id="@+id/btnSub"
+                style="@style/CaculatorButtonStyle"
+                android:text="TRỪ"  />
+
+            <Button
+                android:id="@+id/btnMul"
+                style="@style/CaculatorButtonStyle"
+                android:text="NHÂN" />
+
+            <Button
+                android:id="@+id/btnDiv"
+                style="@style/CaculatorButtonStyle"
+                android:text="CHIA" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvResult"
+            android:text="Kết quả:"
+            android:textSize="16sp"
+            android:textStyle="italic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

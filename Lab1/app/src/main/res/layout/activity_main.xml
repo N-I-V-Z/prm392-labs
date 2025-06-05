@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/linearLayoutTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/purple"
+        android:padding="12dp"
+        android:text="Linear Layout	"
+        android:textColor="@color/white"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/androidTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/yellow"
+        android:gravity="top"
+        android:paddingTop="12dp"
+        android:paddingBottom="100dp"
+        android:text="Android"
+        android:textColor="@color/red"
+        android:textSize="34sp" />
+
+    <TextView
+        android:id="@+id/phpTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/blue"
+        android:paddingTop="12dp"
+        android:paddingBottom="100dp"
+        android:text="PHP"
+        android:textColor="@color/orange"
+        android:textSize="34sp" />
+
+    <TextView
+        android:id="@+id/sqlTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@color/teal"
+        android:paddingTop="12dp"
+        android:paddingBottom="100dp"
+        android:text="SQL"
+        android:textColor="@color/yellow"
+        android:textSize="34sp" />
+
+    <TextView
+        android:id="@+id/pythonTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@color/orange"
+        android:paddingTop="12dp"
+        android:paddingBottom="100dp"
+        android:text="PYTHON"
+        android:textColor="@color/teal"
+        android:textSize="34sp" />
+</LinearLayout>

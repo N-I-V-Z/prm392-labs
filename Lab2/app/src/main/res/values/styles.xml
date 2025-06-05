@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="CaculatorButtonStyle">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">2dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:background">#6200EE</item>
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
+    <style name="CaculatorEditTextStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/edittext_border</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:layout_marginBottom">12dp</item>
+    </style>
+</resources>
