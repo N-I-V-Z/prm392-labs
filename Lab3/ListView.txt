@@ -1,0 +1,332 @@
+* ListView
++Các thành phần chính của ListView
+	- ListView: Widget hiển thị danh sách.
+	- Adapter: Cầu nối giữa dữ liệu và giao diện hiển thị. Một số loại Adapter phổ biến:
+		ArrayAdapter: Dùng để hiển thị danh sách đơn giản từ một mảng hoặc danh sách (List<T>).
+		BaseAdapter: Cho phép tùy chỉnh nhiều hơn.
+		SimpleAdapter: Hỗ trợ hiển thị dữ liệu dạng Map.
+		CursorAdapter: Dùng khi làm việc với database (SQLite).
+
++ Ưu điểm của ListView
+	Dễ sử dụng, thích hợp cho danh sách đơn giản.
+	Hỗ trợ cuộn và quản lý hiệu suất bằng cách tái sử dụng View.
+	Dễ dàng tích hợp với ArrayAdapter hoặc Custom Adapter.
++ Nhược điểm
+	Ít linh hoạt hơn RecyclerView, khó khăn khi cần tùy chỉnh phức tạp.
+	Hiệu suất kém hơn RecyclerView đối với danh sách dài.
+==
+VD1 : ListView_1 : hiển thị danh sách đơn giản
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1/ Cấu trúc project 
+activity_main.xml → Chứa ListView
+MainActivity.java → Xử lý logic danh sách
+
++Tóm tắt
+ListView listView; → Khai báo danh sách.
+String[] programmingLanguages → Mảng chứa dữ liệu danh sách.
+ArrayAdapter<String> adapter → Kết nối dữ liệu với ListView.
+listView.setOnItemClickListener(...) → Xử lý khi người dùng chọn một mục.
+
+2/ Thiết kế UI
+Tạo một ListView trong file xml
+
+<ListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+3/ Viết code trong file .java
+	
+	private ListView listView;
+    private String[] programmingLanguages = {"Java", "Python", "C++", "Kotlin", "Swift", "JavaScript", "PHP", "Ruby"};
+	
+    protected void onCreate(Bundle savedInstanceState) {
+	...
+        // Tham chiếu tới ListView
+        listView = findViewById(R.id.listView);
+
+        // Sử dụng ArrayAdapter để hiển thị danh sách chuỗi
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+            this, android.R.layout.simple_list_item_1, programmingLanguages
+        );
+
+        // Gán Adapter vào ListView
+        listView.setAdapter(adapter);
+
+        // Bắt sự kiện khi người dùng chọn một mục trong danh sách
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String selectedItem = programmingLanguages[position];
+                Toast.makeText(MainActivity.this, "Bạn đã chọn: " + selectedItem, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+==
+VD: ListView_2 : hiển thị danh sách đơn giản + cho phép thực hiện các tác vụ thêm, xóa, cập nhật
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++Tóm tắt
+ListView listView; → Khai báo danh sách.
+ArrayList<String> itemList → Mảng chứa dữ liệu danh sách.
+ArrayAdapter<String> adapter → Kết nối dữ liệu với ListView.
+selectedIndex = -1  →  vị trí item được chọn trong ListView
+
+
+listView.setOnItemClickListener(...) → Xử lý khi người dùng chọn một mục, gán lại selectedIndex = position;
++Thêm: Khi nhấn nút THÊM, lấy dữ liệu từ EditText, thêm vào danh sách và cập nhật ListView.
+String newItem = edtItem.getText().toString().trim();
+                if (!newItem.isEmpty()) {
+                    itemList.add(newItem);
+                    adapter.notifyDataSetChanged();
+                    edtItem.setText("");
+                }
+
++Cập nhật: Khi chọn một mục trong danh sách, nội dung hiển thị trong EditText. Khi nhấn CẬP NHẬT, thay đổi giá trị trong danh sách.
+String updatedItem = edtItem.getText().toString().trim();
+                if (selectedIndex != -1 && !updatedItem.isEmpty()) {
+                    itemList.set(selectedIndex, updatedItem);
+                    adapter.notifyDataSetChanged();
+                    edtItem.setText("");
+                    selectedIndex = -1;
+                }
+
++Xóa: Khi chọn một mục và nhấn XÓA, mục đó bị xóa khỏi danh sách.
+if (selectedIndex != -1) {
+                    itemList.remove(selectedIndex);
+                    adapter.notifyDataSetChanged();
+                    edtItem.setText("");
+                    selectedIndex = -1;
+                }
+
+==
+VD: ListView_3 : Custom ListView
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- Mỗi item trong ListView là một view/group view, bao gồm một/nhiều thành phần
+- Do vậy:
+	+ cần định nghĩa lớp dữ liệu tương ứng bao gồm một/nhiều thuộc tính
+	+ cần định nghĩa custom adapter tương ứng, override method getView
+1/Thiết kế item trong ListView (file list_item.xml) : gồm hình ảnh, tên và mô tả
+2/Định nghĩa lớp mô hình dữ liệu cho item : Fruit.java
+3/Định nghĩa custom Adapter cho việc liên kết dữ liệu vào ListView : FruitAdapter.java 
+	* Chi tiết method getView() (trong FruitAdapter.java)
+	- Kiểm tra convertView:
+		convertView là view cũ có thể được tái sử dụng. Nếu nó null, chúng ta inflate một View mới từ list_item.xml để tránh tạo quá nhiều View gây tốn tài nguyên.
+	- Lấy dữ liệu của item hiện tại:
+		Sử dụng position để lấy một Fruit từ fruitList.
+	- Ánh xạ các thành phần trong list_item.xml:
+		Lấy ImageView, TextView từ convertView.
+	- Gán dữ liệu vào giao diện:
+		Đặt ảnh, tên và mô tả vào ImageView và TextView.
+	- Trả về convertView:
+		Đây là View đã được cập nhật nội dung, và nó sẽ hiển thị trong ListView.
+
+4/Thiết kế giao diện chính chứa ListView : listview_3.xml
+5/Lớp xử lý logic cho giao diện chính  : ListView_3.java
+==
+1/ list_item.xml
+    <ImageView
+        android:id="@+id/imgFruit"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:scaleType="centerCrop" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="10dp">
+
+        <TextView
+            android:id="@+id/txtName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="#777" />
+
+2/Định nghĩa lớp mô hình dữ liệu cho item : Fruit.java
+public class Fruit {
+    private String name;
+    private String description;
+    private int imageId;
+
+    public Fruit(String name, String description, int imageId) {
+        this.name = name;
+        this.description = description;
+        this.imageId = imageId;
+    }
+
+    public String getName() { return name; }
+    public String getDescription() { return description; }
+    public int getImageId() { return imageId; }
+
+    public void setName(String name) { this.name = name; }
+    public void setDescription(String description) { this.description = description; }
+}
+
+3/Định nghĩa custom Adapter cho việc liên kết dữ liệu vào ListView : FruitAdapter.java 
+public class FruitAdapter extends BaseAdapter {
+    private Context context;
+    private List<Fruit> fruitList;
+
+    public FruitAdapter(Context context, List<Fruit> fruitList) {
+        this.context = context;
+        this.fruitList = fruitList;
+    }
+
+    @Override
+    public int getCount() { return fruitList.size(); }
+
+    @Override
+    public Object getItem(int position) { return fruitList.get(position); }
+
+    @Override
+    public long getItemId(int position) { return position; }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        //+Kiểm tra convertView:
+        // convertView là view cũ có thể được tái sử dụng.
+        // Nếu nó null, chúng ta inflate một View mới từ list_item.xml để tránh tạo quá nhiều View gây tốn tài nguyên.
+        if (convertView == null) {
+            convertView = LayoutInflater.from(context).inflate(R.layout.list_item, parent, false);
+        }
+
+        //+Lấy dữ liệu của item hiện tại:
+        // Sử dụng position để lấy một Fruit từ fruitList.
+        Fruit fruit = fruitList.get(position);
+
+        //+Ánh xạ các thành phần trong list_item.xml:
+        // Lấy ImageView, TextView từ convertView.
+        ImageView imgFruit = convertView.findViewById(R.id.imgFruit);
+        TextView txtName = convertView.findViewById(R.id.txtName);
+        TextView txtDescription = convertView.findViewById(R.id.txtDescription);
+
+        //+Gán dữ liệu vào giao diện:
+        // Đặt ảnh, tên và mô tả vào ImageView và TextView.
+        imgFruit.setImageResource(fruit.getImageId());
+        txtName.setText(fruit.getName());
+        txtDescription.setText(fruit.getDescription());
+
+        //+Trả về convertView:
+        // Đây là View đã được cập nhật nội dung, và nó sẽ hiển thị trong ListView.
+        return convertView;
+    }
+}
+
+4/Thiết kế giao diện chính chứa ListView : listview_3.xml
+    <Button
+        android:id="@+id/btnAdd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Thêm Item" />
+
+    <Button
+        android:id="@+id/btnEdit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sửa Item" />
+
+    <Button
+        android:id="@+id/btnDelete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Xóa Item" />
+
+    <Button
+        android:id="@+id/btnClose"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Đóng"/>
+
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+5/Lớp xử lý logic cho giao diện chính  : ListView_3.java
+public class ListView_3 extends AppCompatActivity {
+
+    private ListView listView;
+    private FruitAdapter adapter;
+    private ArrayList<Fruit> fruitList;
+    private int selectedPosition = -1; // Vị trí item đang được chọn
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.listview_3);
+
+        listView = findViewById(R.id.listView);
+        Button btnAdd = findViewById(R.id.btnAdd);
+        Button btnEdit = findViewById(R.id.btnEdit);
+        Button btnDelete = findViewById(R.id.btnDelete);
+        Button btnClose = findViewById(R.id.btnClose);
+
+        // Dữ liệu ban đầu
+        fruitList = new ArrayList<>();
+        fruitList.add(new Fruit("Chuối tiêu", "Chuối tiêu Long An", R.drawable.chuoitieu));
+        fruitList.add(new Fruit("Thanh Long", "Thanh long ruột đỏ", R.drawable.thanhlong));
+        fruitList.add(new Fruit("Dâu tây", "Dâu tây Đà Lạt", R.drawable.dautay));
+
+        adapter = new FruitAdapter(this, fruitList);
+        listView.setAdapter(adapter);
+
+        // Chọn item trong ListView
+        listView.setOnItemClickListener((parent, view, position, id) -> selectedPosition = position);
+
+        // Thêm item mới
+        btnAdd.setOnClickListener(v -> {
+            fruitList.add(new Fruit("Cam vàng", "Cam Vàng Cái Bè", R.drawable.camvang));
+            adapter.notifyDataSetChanged();
+            Toast.makeText(ListView_3.this, "Đã thêm Cam Vàng", Toast.LENGTH_SHORT).show();
+        });
+
+        // Sửa item
+        btnEdit.setOnClickListener(v -> {
+            if (selectedPosition != -1) {
+                Fruit fruit = fruitList.get(selectedPosition);
+                fruit.setName(fruit.getName() + " (Updated)");
+                fruit.setDescription("Đã cập nhật mô tả");
+                adapter.notifyDataSetChanged();
+                Toast.makeText(ListView_3.this, "Đã cập nhật " + fruit.getName(), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(ListView_3.this, "Vui lòng chọn item để sửa", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Xóa item
+        btnDelete.setOnClickListener(v -> {
+            if (selectedPosition != -1) {
+                new AlertDialog.Builder(ListView_3.this)
+                        .setTitle("Xóa Item")
+                        .setMessage("Bạn có chắc muốn xóa " + fruitList.get(selectedPosition).getName() + " không?")
+                        .setPositiveButton("Xóa", (dialog, which) -> {
+                            fruitList.remove(selectedPosition);
+                            adapter.notifyDataSetChanged();
+                            selectedPosition = -1; // Reset vị trí
+                            Toast.makeText(ListView_3.this, "Đã xóa item", Toast.LENGTH_SHORT).show();
+                        })
+                        .setNegativeButton("Hủy", null)
+                        .show();
+            } else {
+                Toast.makeText(ListView_3.this, "Vui lòng chọn item để xóa", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Xử lý sự kiện nút Đóng
+        btnClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+    }
+}
