@@ -1,0 +1,38 @@
+btnShowListView1.setOnClickListener(v -> {
+	Intent intent = new Intent(MainActivity.this, ListView_1.class);
+	//start Activity và chờ kết quả
+	//Cách cũ (từ Android 11 / API 30 trở lên không còn dùng nữa)
+	//startActivityForResult(intent, 101);
+
+	//Cách mới: dùng activityResultLauncher.launch(intent) để mở Activity
+	activityResultLauncher_ListView_1.launch(intent); // Dùng activityResultLauncher Gửi Intent đến Activity
+});
+
+//Xử lý biến cố quay về trả kết quả từ ListView_1
+/*
+//Cách cũ (từ Android 11 / API 30 trở lên không còn dùng nữa)
+@Override
+protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+	super.onActivityResult(requestCode, resultCode, data);
+	if (requestCode == 101 && resultCode == RESULT_OK && data != null) {
+		String selectedItem = data.getStringExtra("selectedItem");
+		txvSelectedItem.setText("Item đã chọn: " + selectedItem);
+	}
+}
+//
+*/
+
+//Cách mới: Thay thế onActivityResult() bằng registerForActivityResult() để xử lý kết quả trả về.
+// Sử dụng Activity Result API thay vì onActivityResult()
+// Biến activityResultLauncher_ListView_1 dùng mở ListView_1
+private final ActivityResultLauncher<Intent> activityResultLauncher_ListView_1 =
+		registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+				new ActivityResultCallback<ActivityResult>() {
+					@Override
+					public void onActivityResult(ActivityResult result) {
+						if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+							String selectedItem = result.getData().getStringExtra("selectedItem");
+							txvSelectedItem.setText("Item đã chọn: " + selectedItem);
+						}
+					}
+				});
