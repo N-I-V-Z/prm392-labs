@@ -1,0 +1,199 @@
+Cấu trúc project
+├── res/
+│   ├── layout/
+│   │     ├── activity_home.xml      (Giao diện danh sách sản phẩm)
+│   │     ├── activity_detail.xml    (Giao diện chi tiết sản phẩm)
+│   │     ├── item_product.xml       (Giao diện item trong RecyclerView)
+├── java/
+│   ├── HomeActivity.java            (Chứa RecyclerView)
+│   ├── DetailActivity.java          (Hiển thị chi tiết sản phẩm)
+│   ├── ProductAdapter.java          (Adapter cho RecyclerView)
+│   ├── Product.java                 (Model sản phẩm)
+
+1.Bổ sung thư viện vào build.gradle.kts (app)
+dependencies {
+    implementation("androidx.recyclerview:recyclerview:1.2.1")
+}
+
+2. Các layout
+2.1 activity_home.xml      (Giao diện danh sách sản phẩm)
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView_1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+</LinearLayout>
+
+2.2 item_product.xml       (Giao diện item trong RecyclerView)
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp"
+    android:background="@android:color/white"
+    android:layout_margin="4dp">
+
+    <ImageView
+        android:id="@+id/imgProduct"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:scaleType="centerCrop" />
+
+    <TextView
+        android:id="@+id/tvName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Product Name"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:paddingTop="4dp" />
+</LinearLayout>
+
+2.3 activity_detail.xml    (Giao diện chi tiết sản phẩm)
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <ImageView
+        android:id="@+id/imgDetail"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:scaleType="centerCrop" />
+
+    <TextView
+        android:id="@+id/tvDetailName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:paddingTop="8dp"/>
+
+    <TextView
+        android:id="@+id/tvDetailDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:paddingTop="4dp"/>
+</LinearLayout>
+
+3.Product.java                 (Model sản phẩm)
+public class Product implements Serializable {
+    private String name;
+    private String description;
+    private int imageResId;
+
+    public Product(String name, String description, int imageResId) {
+        this.name = name;
+        this.description = description;
+        this.imageResId = imageResId;
+    }
+
+    public String getName() { return name; }
+    public String getDescription() { return description; }
+    public int getImageResId() { return imageResId; }
+}
+
+4. ProductAdapter.java          (Adapter cho RecyclerView)
+public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHolder> {
+    private Context context;
+    private List<Product> productList;
+
+    public ProductAdapter(Context context, List<Product> productList) {
+        this.context = context;
+        this.productList = productList;
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context).inflate(R.layout.item_product, parent, false);
+        return new ViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        Product product = productList.get(position);
+        holder.tvName.setText(product.getName());
+        holder.imgProduct.setImageResource(product.getImageResId());
+
+        // Click vào item để mở DetailActivity
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, DetailActivity.class);
+            intent.putExtra("product", product);
+            context.startActivity(intent);
+        });
+    }
+
+    @Override
+    public int getItemCount() {
+        return productList.size();
+    }
+
+    static class ViewHolder extends RecyclerView.ViewHolder {
+        TextView tvName;
+        ImageView imgProduct;
+
+        ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            tvName = itemView.findViewById(R.id.tvName);
+            imgProduct = itemView.findViewById(R.id.imgProduct);
+        }
+    }
+}
+
+5.DetailActivity.java          (Hiển thị chi tiết sản phẩm)
+public class DetailActivity extends AppCompatActivity {
+    private ImageView imgDetail;
+    private TextView tvDetailName, tvDetailDescription;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_detail);
+
+        imgDetail = findViewById(R.id.imgDetail);
+        tvDetailName = findViewById(R.id.tvDetailName);
+        tvDetailDescription = findViewById(R.id.tvDetailDescription);
+
+        Product product = (Product) getIntent().getSerializableExtra("product");
+
+        if (product != null) {
+            tvDetailName.setText(product.getName());
+            tvDetailDescription.setText(product.getDescription());
+            imgDetail.setImageResource(product.getImageResId());
+        }
+    }
+}
+
+6.HomeActivity.java            (Chứa RecyclerView)
+public class HomeActivity extends AppCompatActivity {
+    private RecyclerView recyclerView;
+    private ProductAdapter adapter;
+    private List<Product> productList;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_home);
+
+        recyclerView = findViewById(R.id.recyclerView_1);
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+
+        productList = new ArrayList<>();
+        productList.add(new Product("Pharmacy", "Mô tả sản phẩm Pharmacy", R.drawable.ic_pharmacy));
+        productList.add(new Product("Cartwheel", "Mô tả sản phẩm Cartwheel", R.drawable.ic_cartwheel));
+        productList.add(new Product("Clothing", "Mô tả sản phẩm Clothing", R.drawable.ic_clothing));
+        productList.add(new Product("Shoes", "Mô tả sản phẩm Shoes", R.drawable.ic_shoes));
+        productList.add(new Product("Accessories", "Mô tả sản phẩm Accessories", R.drawable.ic_accessories));
+
+        adapter = new ProductAdapter(this, productList);
+        recyclerView.setAdapter(adapter);
+    }
+}
+
