@@ -1,0 +1,161 @@
+1/ Load ảnh từ Internet dùng Picasso
+- Khai báo quyền truy cập INTERNET
+
+AndroidManifest.xml
+<uses-permission android:name="android.permission.INTERNET"/>
+
+- Thêm thư viện
+build.gradle.kts
+implementation("com.squareup.picasso:picasso:2.8")
+
+- Load ảnh vào ImageView
+imageView = findViewById(R.id.imageView);
+// URL của ảnh
+String imageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Android_Studio_Logo_2024.svg/180px-Android_Studio_Logo_2024.svg.png";
+
+// Load ảnh từ URL vào ImageView
+Picasso.get()
+	.load(imageUrl)
+	.placeholder(R.drawable.loading_image) // Ảnh hiển thị khi đang tải
+	.error(R.drawable.error_image) // Ảnh hiển thị khi lỗi
+	.into(imageView);
+
+
+2/ Menu
+2.1 Mô tả menu resource
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Mục RecyclerView 1 (không có sub menu) -->
+    <item
+        android:id="@+id/action_recyclerview_1"
+        android:icon="@drawable/ic_recyclerview_1"
+        android:title="RecyclerView 1" />
+
+    <!-- Mục ListViews (có menu con) -->
+    <item
+        android:id="@+id/action_listviews"
+        android:icon="@drawable/ic_listviews"
+        android:title="Các ListViews">
+
+        <!-- Menu con -->
+        <menu>
+            <item
+                android:id="@+id/action_listview_1"
+                android:icon="@drawable/ic_listview_1"
+                android:title="ListView 1" />
+            <item
+                android:id="@+id/action_listview_2"
+                android:icon="@drawable/ic_listview_2"
+                android:title="ListView 2"  />
+            <item
+                android:id="@+id/action_listview_3"
+                android:icon="@drawable/ic_listview_3"
+                android:title="ListView 3"  />
+        </menu>
+    </item>
+
+</menu>
+
+2.2 Option Menu
+Trên Activity hiển thị Option Menu
+
+// Tạo Options Menu
+@Override
+public boolean onCreateOptionsMenu(Menu menu) {
+        //MenuInflater inflater = getMenuInflater();
+        getMenuInflater().inflate(R.menu.options_menu, menu);
+        return true;
+}
+
+// Xử lý sự kiện click vào item trong menu
+@Override
+public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_recyclerview_1) {
+            Toast.makeText(this, "Mở RecyclerView 1", Toast.LENGTH_SHORT).show();
+            return true;
+        } else if (id == R.id.action_listview_1) {
+            Toast.makeText(this, "Mở ListView 1", Toast.LENGTH_SHORT).show();
+            return true;
+        } else if (id == R.id.action_listview_2) {
+            Toast.makeText(this, "Mở ListView 2", Toast.LENGTH_SHORT).show();
+            return true;
+        } else if (id == R.id.action_listview_3) {
+            Toast.makeText(this, "Mở ListView 3", Toast.LENGTH_SHORT).show();
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
+
+2.2 Popup Menu
+- Liên kết hiển thị popup menu với view, VD button
+btnShowPopup.setOnClickListener(new View.OnClickListener() {
+@Override
+public void onClick(View v) {
+                showPopupMenu(v);
+            }
+});
+
+
+//Pop-up menu
+private void showPopupMenu(View view) {
+        PopupMenu popupMenu = new PopupMenu(this, view);
+        MenuInflater inflater = popupMenu.getMenuInflater();
+        inflater.inflate(R.menu.popup_menu, popupMenu.getMenu());
+
+popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                int id = item.getItemId();
+                if (id == R.id.action_recyclerview_1) {
+                    Toast.makeText(MainActivity.this, "Mở RecyclerView 1", Toast.LENGTH_SHORT).show();
+                    return true;
+                } else if (id == R.id.action_listview_1) {
+                    Toast.makeText(MainActivity.this, "Mở ListView 1", Toast.LENGTH_SHORT).show();
+                    return true;
+                } else if (id == R.id.action_listview_2) {
+                    Toast.makeText(MainActivity.this, "Mở ListView 2", Toast.LENGTH_SHORT).show();
+                    return true;
+                } else if (id == R.id.action_listview_3) {
+                    Toast.makeText(MainActivity.this, "Mở ListView 3", Toast.LENGTH_SHORT).show();
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        });
+        popupMenu.show();
+    }
+
+
+2.3 Contextual menu
+- Đăng ký liên kết contextual menu khi long click vào view (VD textViewMenu)
+// Đăng ký textViewMenu với Context Menu
+registerForContextMenu(textViewMenu);
+
+- Tạo Context Menu khi long click vào textViewMenu
+@Override
+public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        getMenuInflater().inflate(R.menu.context_menu, menu);
+    }
+
+- Xử lý sự kiện khi chọn một mục trong Context Menu
+@Override
+public boolean onContextItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_set_redcolor) {
+            Toast.makeText(MainActivity.this, "Chọn Red", Toast.LENGTH_SHORT).show();
+            mainViewLayout.setBackgroundColor(Color.RED);
+            return true;
+        } else if (id == R.id.action_set_greencolor) {
+            Toast.makeText(MainActivity.this, "Chọn Green", Toast.LENGTH_SHORT).show();
+            mainViewLayout.setBackgroundColor(Color.GREEN);
+            return true;
+        } else if (id == R.id.action_set_bluecolor) {
+            Toast.makeText(MainActivity.this, "Chọn Blue", Toast.LENGTH_SHORT).show();
+            mainViewLayout.setBackgroundColor(Color.BLUE);
+            return true;
+        } else {
+            return super.onContextItemSelected(item);
+        }
+    }

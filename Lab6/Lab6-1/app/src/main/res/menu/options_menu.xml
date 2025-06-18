@@ -1,0 +1,26 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Mục RecyclerView 1 (không có sub menu) -->
+    <item
+        android:id="@+id/action_recyclerview_1"
+        android:title="RecyclerView 1" />
+
+    <!-- Mục ListViews (có menu con) -->
+    <item
+        android:id="@+id/action_listviews"
+        android:title="Các ListViews">
+
+        <!-- Menu con -->
+        <menu>
+            <item
+                android:id="@+id/action_listview_1"
+                android:title="ListView 1" />
+            <item
+                android:id="@+id/action_listview_2"
+                android:title="ListView 2"  />
+            <item
+                android:id="@+id/action_listview_3"
+                android:title="ListView 3"  />
+        </menu>
+    </item>
+
+</menu>
