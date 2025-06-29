@@ -1,0 +1,83 @@
+1/ Khai báo cấp quyền trong AndroidManifest.xml
+
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+<uses-permission android:name="android.permission.CALL_PHONE"/>
+
+// Xử lý khi nhấn REQUEST PERMISSION
+btnRequestPermission.setOnClickListener(v -> checkLocationPermission());
+
+// Xử lý khi nhấn OPEN SETTINGS PERMISSION
+btnOpenSettings.setOnClickListener(v -> openAppSettings());
+
+// Xử lý khi nhấn gọi điện thoại
+TextView txtPhone = findViewById(R.id.txtViewPhoneNumber);
+phoneNumber = "tel:" + txtPhone.getText().toString();
+Button btnPhoneCall = findViewById(R.id.btnPhoneCall);
+btnPhoneCall.setOnClickListener(v -> makeCall());
+
+2/ Kiểm tra đã được cấp quyền hay chưa ==> yêu cầu cấp quyền
+
+// Gọi điện thoại
+private void makeCall() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+            Intent intent = new Intent(Intent.ACTION_CALL);
+            intent.setData(Uri.parse(phoneNumber));
+            startActivity(intent);
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CALL_PHONE},
+                    REQUEST_CALL_PERMISSION);
+        }
+}
+
+// Kiểm tra quyền vị trí
+private void checkLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            // Quyền đã được cấp
+            Toast.makeText(this, "PERMISSION Is Granted", Toast.LENGTH_SHORT).show();
+        } else {
+            // Kiểm tra xem có cần hiển thị lời giải thích không
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                showRationaleDialog();
+            } else {
+                // Yêu cầu quyền nếu chưa từng bị từ chối
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        REQUEST_LOCATION_PERMISSION);
+            }
+        }
+}
+
+3/ Xử lý kết quả về quyền được cấp
+// Xử lý kết quả yêu cầu quyền
+@Override
+public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // Kiểm tra requestCode để xử lý kết quả yêu cầu quyền
+        // Quyền vị trí
+        if (requestCode == REQUEST_LOCATION_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "PERMISSION Is Granted", Toast.LENGTH_SHORT).show();
+            } else {
+                // Kiểm tra nếu người dùng đã chọn "Don't ask again"
+                if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    showSettingsDialog();
+                } else {
+                    Toast.makeText(this, "PERMISSION Is Denied", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+
+        // Quyền gọi điện
+        if (requestCode == REQUEST_CALL_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                makeCall();
+                Toast.makeText(this, "CALL PERMISSION Is Granted", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Bạn cần cấp quyền để gọi điện", Toast.LENGTH_SHORT).show();
+            }
+        }
+}
+
