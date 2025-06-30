@@ -1,0 +1,50 @@
+1/ Khai báo cấp quyền trong AndroidManifest.xml
+<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
+Khai báo kênh:
+// Kênh thông báo
+private static final String CHANNEL_ID = "my_notification_channel";
+
+2/ Tạo kênh thông báo (từ Android 8+)
+private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "Notification Channel";
+            String description = "Channel for notifications";
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+3/ Gởi thông báo
+private void sendNotification() {
+        // Intent mở DetailActivity khi click vào thông báo
+        Intent intent = new Intent(this, DetailActivity.class);
+        intent.putExtra("message", "Hello from Notification!");
+
+        // Targeting S+ (version 31 and above) requires that one of FLAG_IMMUTABLE or FLAG_MUTABLE be specified when creating a PendingIntent.
+        int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            flags |= PendingIntent.FLAG_IMMUTABLE; // or FLAG_MUTABLE if needed
+        }
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, flags);
+
+        // Xây dựng thông báo
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_notification) // Icon thông báo
+                .setContentTitle("MainActivity push notification")
+                .setContentText("Message from MainActivity push notification")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setContentIntent(pendingIntent) // Khi nhấn vào sẽ mở DetailActivity
+                .setAutoCancel(true); // Tự động xóa thông báo khi nhấn vào
+
+        // Hiển thị thông báo
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(getNotificationId(), builder.build());
+}
+
+4/ Nhận dữ liệu trong DetailActivity
+String message = getIntent().getStringExtra("message");
